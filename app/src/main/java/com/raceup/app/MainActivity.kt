@@ -3,6 +3,7 @@ package com.raceup.app
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.raceup.app.firebase.FirebaseAuthManager
@@ -10,6 +11,7 @@ import com.raceup.app.firebase.FirebaseAuthManager
 class MainActivity : AppCompatActivity() {
 
     private lateinit var logoutButton: Button
+    private lateinit var welcomeTextView: TextView
     private val authManager = FirebaseAuthManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,6 +19,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         logoutButton = findViewById(R.id.logoutButton)
+        welcomeTextView = findViewById(R.id.welcomeTextView)
+
+        val currentUser = authManager.currentUser()
+        val displayName = currentUser?.displayName ?: currentUser?.email ?: "User"
+        welcomeTextView.text = "Welcome, $displayName!"
 
         logoutButton.setOnClickListener {
             authManager.logout()
