@@ -1,4 +1,4 @@
-package com.example.raceup.ui.theme
+package com.raceup.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

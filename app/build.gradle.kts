@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.raceup"
+    namespace = "com.raceup.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.raceup"
+        applicationId = "com.raceup.app"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

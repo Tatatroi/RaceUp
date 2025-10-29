@@ -1,6 +1,5 @@
-package com.example.raceup.ui.theme
+package com.raceup.app.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

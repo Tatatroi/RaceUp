@@ -1,4 +1,4 @@
-package com.example.raceup
+package com.raceup.app
 
 import org.junit.Test
 
