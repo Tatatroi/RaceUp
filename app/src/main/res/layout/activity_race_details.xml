@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="#FAFAFA">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Race Name -->
+        <TextView
+            android:id="@+id/detailRaceName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Race Name"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:paddingBottom="8dp" />
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/detailRaceDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textSize="18sp"
+            android:textColor="#444444"
+            android:paddingBottom="6dp" />
+
+        <!-- Distance -->
+        <TextView
+            android:id="@+id/detailRaceDistance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Distance"
+            android:textSize="18sp"
+            android:textColor="#444444"
+            android:paddingBottom="6dp" />
+
+        <!-- Website -->
+        <TextView
+            android:id="@+id/detailRaceWebsite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Website"
+            android:textSize="18sp"
+            android:textColor="#2962FF"
+            android:autoLink="web"
+            android:paddingBottom="20dp" />
+
+        <!-- Add to Favorites Button -->
+        <Button
+            android:id="@+id/addFavoriteButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add to Favorites"
+            android:padding="12dp"
+            android:textSize="18sp"
+            android:backgroundTint="#FF4081"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:stateListAnimator="@null" />
+
+    </LinearLayout>
+
+</ScrollView>
