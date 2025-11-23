@@ -33,6 +33,18 @@
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
+        <activity
+            android:name=".RaceListActivity"
+            android:exported="true" />
+        <activity
+            android:name=".RaceFormActivity"
+            android:exported="true" />
+        <activity
+            android:name=".FavoritesActivity"
+            android:exported="true" />
+        <activity
+            android:name=".RaceDetailsActivity"
+            android:exported="true"/>
     </application>
 
 </manifest>
