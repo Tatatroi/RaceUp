@@ -3,6 +3,7 @@ package com.raceup.app
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var logoutButton: Button
     private lateinit var welcomeTextView: TextView
+    private lateinit var manageRacesButton: Button
     private val authManager = FirebaseAuthManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,6 +21,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         logoutButton = findViewById(R.id.logoutButton)
+        manageRacesButton = findViewById(R.id.manageRacesButton)
         welcomeTextView = findViewById(R.id.welcomeTextView)
 
         val currentUser = authManager.currentUser()
@@ -32,6 +35,14 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
+        }
+
+        manageRacesButton.setOnClickListener {
+            startActivity(Intent(this, RaceListActivity::class.java))
+        }
+
+        findViewById<ImageButton>(R.id.imageButton5).setOnClickListener {
+            startActivity(Intent(this, FavoritesActivity::class.java))
         }
     }
 
