@@ -1,18 +1,19 @@
 [versions]
 agp = "8.13.0"
-kotlin = "2.0.21"
+kotlin = "2.2.21"
 coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
-lifecycleRuntimeKtx = "2.9.4"
-activityCompose = "1.11.0"
-composeBom = "2024.09.00"
+lifecycleRuntimeKtx = "2.10.0"
+activityCompose = "1.12.0"
+composeBom = "2025.11.01"
 constraintlayout = "2.2.1"
 appcompat = "1.7.1"
 # VERSIUNEA UNICĂ PENTRU FIREBASE, CEA A BOM-ULUI
 firebaseBom = "34.4.0"
 material3 = "1.4.0"
+recyclerview = "1.4.0"
 # Am șters firebaseAuthKtx = "24.0.1" pentru a lăsa BOM-ul să decidă versiunea
 
 [libraries]
@@ -39,6 +40,8 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" } # Fără versiune, BOM se ocupă
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" } # Fără versiune, BOM se ocupă
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" } # Fără versiune, BOM se ocupă
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
