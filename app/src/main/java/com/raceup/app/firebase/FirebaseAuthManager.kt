@@ -1,6 +1,7 @@
 package com.raceup.app.firebase
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class FirebaseAuthManager {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -14,6 +15,13 @@ class FirebaseAuthManager {
                     callback(false, task.exception?.message)
                 }
             }
+    }
+
+    companion object {
+        // Trebuie să fie aici pentru a fi apelată ca FirebaseAuthManager.getCurrentUser()
+        fun getCurrentUser(): FirebaseUser? {
+            return FirebaseAuth.getInstance().currentUser
+        }
     }
 
     fun loginUser(email: String, password: String, callback: (Boolean, String?) -> Unit) {
@@ -32,4 +40,5 @@ class FirebaseAuthManager {
     }
 
     fun currentUser() = auth.currentUser
+
 }
