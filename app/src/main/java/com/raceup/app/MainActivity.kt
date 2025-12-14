@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cardFavorites: CardView
     private lateinit var cardSuggest: CardView
     private lateinit var cardAdmin: CardView
+    private lateinit var cardMap: CardView
 
     private val authManager = FirebaseAuthManager()
 
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         cardFavorites = findViewById(R.id.cardFavorites)
         cardSuggest = findViewById(R.id.cardSuggest)
         cardAdmin = findViewById(R.id.cardAdmin)
+        cardMap = findViewById(R.id.cardMap)
 
         // 2. Setup User Info
         val currentUser = authManager.currentUser()
@@ -51,6 +53,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
+        }
+
+        cardMap.setOnClickListener {
+            startActivity(Intent(this, MapExplorerActivity::class.java))
         }
 
         // 4. CLICK LISTENERS
