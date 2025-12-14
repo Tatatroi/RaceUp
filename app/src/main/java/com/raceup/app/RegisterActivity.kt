@@ -10,85 +10,93 @@ import android.provider.MediaStore
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-
+import com.google.firebase.auth.FirebaseAuth
 import com.raceup.app.firebase.FirebaseAuthManager
 import com.raceup.app.firebase.FirebaseFirestoreManager
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
-import android.widget.ImageView
-
 
 class RegisterActivity : AppCompatActivity() {
 
+    // --- 1. DECLARE VARIABLES HERE (At the top of the class) ---
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
-    private lateinit var registerButton: Button
-    private lateinit var loginRedirect: TextView
-
+    private lateinit var confirmPasswordEditText: EditText
     private lateinit var firstNameEditText: EditText
-
     private lateinit var lastNameEditText: EditText
-
     private lateinit var birthDateEditText: EditText
-
     private lateinit var genderSpinner: Spinner
 
-    private lateinit var confirmPasswordEditText: EditText
+    private lateinit var registerButton: Button
+    private lateinit var loginRedirect: TextView
+    private lateinit var profileImageView: ImageView
 
     private var selectedImageUri: Uri? = null
 
-    private lateinit var profileImageView: ImageView
-
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            selectedImageUri = uri
-            profileImageView.setImageURI(uri)
+    // Image Picker Logic
+    private val pickImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                selectedImageUri = uri
+                profileImageView.setImageURI(uri)
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        // --- 2. INITIALIZE VIEWS ---
         emailEditText = findViewById(R.id.emailRegisterEditText)
         passwordEditText = findViewById(R.id.passwordRegisterEditText)
         confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText)
+        firstNameEditText = findViewById(R.id.firstNameEditText)
+        lastNameEditText = findViewById(R.id.lastNameEditText)
+
+        birthDateEditText = findViewById(R.id.birthDateEditText)
+        // Date Picker settings
+        birthDateEditText.isFocusable = false
+        birthDateEditText.isClickable = true
+
+        genderSpinner = findViewById(R.id.genderSpinner)
+
         registerButton = findViewById(R.id.registerButton)
         loginRedirect = findViewById(R.id.loginRedirect)
         profileImageView = findViewById(R.id.profileImageView)
+
+        // Setup Image Picker Click
         profileImageView.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
-        firstNameEditText = findViewById(R.id.firstNameEditText)
-        lastNameEditText = findViewById(R.id.lastNameEditText)
-        birthDateEditText = findViewById(R.id.birthDateEditText)
-        birthDateEditText.isFocusable = false
-        birthDateEditText.isClickable = true
-        genderSpinner = findViewById(R.id.genderSpinner)
 
+        // Setup Gender Spinner
         val genderOptions = arrayOf("Pick your gender", "Male", "Female")
-
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, genderOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
         genderSpinner.adapter = adapter
 
-
+        // --- 3. REGISTER BUTTON LOGIC ---
         registerButton.setOnClickListener {
-            val email = emailEditText.text.toString()
-            val password = passwordEditText.text.toString()
-            val confirmPassword = confirmPasswordEditText.text.toString()
-
-            val firstName = firstNameEditText.text.toString()
-            val lastName = lastNameEditText.text.toString()
-            val birthDate = birthDateEditText.text.toString()
+            val email = emailEditText.text.toString().trim()
+            val password = passwordEditText.text.toString().trim()
+            val confirmPassword = confirmPasswordEditText.text.toString().trim()
+            val firstName = firstNameEditText.text.toString().trim()
+            val lastName = lastNameEditText.text.toString().trim()
+            val birthDate = birthDateEditText.text.toString().trim()
             val gender = genderSpinner.selectedItem.toString()
+
+            // Validations
+            if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             if (gender == "Pick your gender") {
                 Toast.makeText(this, "Please select your gender", Toast.LENGTH_SHORT).show()
@@ -100,39 +108,53 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // În RegisterActivity.kt
-
+            // Register with Firebase
             FirebaseAuthManager().registerUser(email, password) { success, errorMessage ->
                 if (success) {
-                    val currentUserId = FirebaseAuthManager.getCurrentUser()?.uid
+                    // FIX: Use the direct instance to get the UID safely
+                    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
                     if (currentUserId != null) {
-                        var localImagePath = "";
-
+                        var localImagePath = ""
                         if (selectedImageUri != null) {
-                            localImagePath = saveImageToInternalStorage(currentUserId, selectedImageUri!!)
+                            localImagePath =
+                                saveImageToInternalStorage(currentUserId, selectedImageUri!!)
                         }
 
-                        FirebaseFirestoreManager().saveUserExtraData(currentUserId, firstName, lastName, birthDate, gender, localImagePath)
+                        // Save extra info to Firestore
+                        FirebaseFirestoreManager().saveUserExtraData(
+                            currentUserId,
+                            firstName,
+                            lastName,
+                            birthDate,
+                            gender,
+                            localImagePath
+                        )
 
-                        Toast.makeText(this, "Cont creat cu succes!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this, LoginActivity::class.java))
+                        Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT)
+                            .show()
+
+                        // Clear back stack and go to Login
+                        val intent = Intent(this, LoginActivity::class.java)
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
                         finish()
                     } else {
-                        Toast.makeText(this, "Eroare: ID-ul utilizatorului nu a fost găsit.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Error: User ID not found.", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    Toast.makeText(this, "Eroare: $errorMessage", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error: $errorMessage", Toast.LENGTH_SHORT).show()
                 }
             }
-
-
         }
 
+        // Login Redirect
         loginRedirect.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
 
+        // Date Picker Click
         birthDateEditText.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
@@ -142,24 +164,16 @@ class RegisterActivity : AppCompatActivity() {
             val datePickerDialog = android.app.DatePickerDialog(
                 this,
                 { _, selectedYear, selectedMonth, selectedDay ->
-                    // Această funcție se execută când utilizatorul alege o dată
-                    // Luna începe de la 0 (Ianuarie), deci adăugăm 1
                     val formattedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
                     birthDateEditText.setText(formattedDate)
                 },
                 year, month, day
             )
             datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
-
             datePickerDialog.show()
-
         }
-
-
-
     }
 
-    // --- FUNCȚIA CARE SALVEAZĂ POZA ÎN MEMORIA TELEFONULUI ---
     private fun saveImageToInternalStorage(userId: String, uri: Uri): String {
         try {
             val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -170,7 +184,6 @@ class RegisterActivity : AppCompatActivity() {
                 MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
             }
 
-            // Salvăm poza cu numele "profile_IDUSER.jpg"
             val fileName = "profile_$userId.jpg"
             val file = File(this.filesDir, fileName)
 
@@ -179,14 +192,10 @@ class RegisterActivity : AppCompatActivity() {
             outputStream.flush()
             outputStream.close()
 
-            return file.absolutePath // Returnăm calea unde s-a salvat
+            return file.absolutePath
         } catch (e: Exception) {
             e.printStackTrace()
             return ""
         }
     }
-
-
 }
-
-

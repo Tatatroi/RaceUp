@@ -57,6 +57,7 @@ dependencies {
 //    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.appcompat)
+    implementation("com.google.android.gms:play-services-maps:19.2.0")
 
 //    implementation(platform(libs.firebase.bom))
 //    implementation(libs.firebase.auth.ktx)
@@ -65,7 +66,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.cardview)
+    implementation(libs.material)
 
 //    implementation(platform(libs.firebase.bom))
 //
