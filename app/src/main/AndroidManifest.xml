@@ -11,17 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.RaceUp">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Base.Theme.RaceUp">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -30,21 +20,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:theme="@style/Base.Theme.RaceUp" />
+
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
+
         <activity
             android:name=".RaceListActivity"
-            android:exported="true" />
+            android:exported="false" />
+
         <activity
             android:name=".RaceFormActivity"
-            android:exported="true" />
+            android:exported="false" />
+
         <activity
             android:name=".FavoritesActivity"
-            android:exported="true" />
+            android:exported="false" />
+
         <activity
             android:name=".RaceDetailsActivity"
-            android:exported="true"/>
+            android:exported="false" />
+
     </application>
 
 </manifest>

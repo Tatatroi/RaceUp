@@ -67,6 +67,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.cardview)
+    implementation(libs.material)
 
 //    implementation(platform(libs.firebase.bom))
 //

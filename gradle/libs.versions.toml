@@ -14,6 +14,8 @@ appcompat = "1.7.1"
 firebaseBom = "34.4.0"
 material3 = "1.4.0"
 recyclerview = "1.4.0"
+cardview = "1.0.0"
+material = "1.13.0"
 # Am șters firebaseAuthKtx = "24.0.1" pentru a lăsa BOM-ul să decidă versiunea
 
 [libraries]
@@ -40,8 +42,9 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" } # Fără versiune, BOM se ocupă
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" } # Fără versiune, BOM se ocupă
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
-androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" } # Fără versiune, BOM se ocupă
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+androidx-cardview = { group = "androidx.cardview", name = "cardview", version.ref = "cardview" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" } # Fără versiune, BOM se ocupă
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
