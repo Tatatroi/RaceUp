@@ -1,5 +1,6 @@
 package com.raceup.app
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ class RaceAdapter(
         val nameText: TextView = view.findViewById(R.id.raceNameText)
         val dateText: TextView = view.findViewById(R.id.raceDateText)
         val distanceText: TextView = view.findViewById(R.id.raceDistanceText)
+        val statusBadge: TextView = view.findViewById(R.id.statusBadge)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RaceViewHolder {
@@ -30,8 +32,15 @@ class RaceAdapter(
         holder.dateText.text = race.date
         holder.distanceText.text = race.distance
 
+        if (!race.isApproved) {
+            holder.statusBadge.visibility = View.VISIBLE
+            holder.statusBadge.text = "PENDING APPROVAL"
+        } else {
+            holder.statusBadge.visibility = View.GONE
+        }
+
         holder.view.setOnClickListener {
-            onRaceClick(race)  // Call the callback instead of directly starting activity
+            onRaceClick(race)
         }
     }
 
