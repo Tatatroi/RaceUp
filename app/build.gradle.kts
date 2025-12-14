@@ -57,6 +57,7 @@ dependencies {
 //    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.appcompat)
+    implementation("com.google.android.gms:play-services-maps:19.2.0")
 
 //    implementation(platform(libs.firebase.bom))
 //    implementation(libs.firebase.auth.ktx)
