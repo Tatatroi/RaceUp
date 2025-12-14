@@ -6,8 +6,14 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 
-class RaceFormActivity : AppCompatActivity() {
+class RaceFormActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // UI Elements
     private lateinit var raceNameEditText: EditText
@@ -24,6 +30,9 @@ class RaceFormActivity : AppCompatActivity() {
 
     private var selectedDate: String? = null
 
+    private lateinit var mMap: GoogleMap
+    private var selectedLocation: LatLng? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_race_form)
@@ -39,6 +48,25 @@ class RaceFormActivity : AppCompatActivity() {
         cbHalf = findViewById(R.id.cbHalf)
         cbFull = findViewById(R.id.cbFull)
         customDistanceEditText = findViewById(R.id.customDistanceEditText)
+
+        val scrollView = findViewById<ScrollView>(R.id.scrollView)
+        val mapContainer = findViewById<FrameLayout>(R.id.mapContainer)
+
+        mapContainer.setOnTouchListener { v, event ->
+            when (event.action) {
+                android.view.MotionEvent.ACTION_DOWN,
+                android.view.MotionEvent.ACTION_MOVE -> {
+                    // User is touching the map -> Disable page scrolling
+                    scrollView.requestDisallowInterceptTouchEvent(true)
+                }
+                android.view.MotionEvent.ACTION_UP,
+                android.view.MotionEvent.ACTION_CANCEL -> {
+                    // User let go -> Re-enable page scrolling
+                    scrollView.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false // Return false so the event still goes to the Map
+        }
 
         // Date Picker Logic
         raceDateButton.setOnClickListener {
@@ -57,9 +85,28 @@ class RaceFormActivity : AppCompatActivity() {
             datePicker.show()
         }
 
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.mapFragment) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
         // Submit Logic
         submitButton.setOnClickListener {
             submitRace()
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        // Default View (Example: Center of Europe or User Location)
+        val defaultLocation = LatLng(51.1657, 10.4515) // Germany center
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 5f))
+
+        mMap.setOnMapClickListener { latLng ->
+            // Clear old marker and add new one
+            mMap.clear()
+            mMap.addMarker(MarkerOptions().position(latLng).title("Race Start"))
+            selectedLocation = latLng
         }
     }
 
@@ -92,6 +139,10 @@ class RaceFormActivity : AppCompatActivity() {
             Toast.makeText(this, "Please select at least one distance", Toast.LENGTH_SHORT).show()
             return
         }
+        if (selectedLocation == null) {
+            Toast.makeText(this, "Please tap the map to select a start location", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         // 3. SEND TO FIRESTORE
         val db = FirebaseFirestore.getInstance()
@@ -103,7 +154,9 @@ class RaceFormActivity : AppCompatActivity() {
             "date" to date,
             "distance" to finalDistanceString, // Stores multiple distances now
             "website" to website,
-            "isApproved" to false // IMPORTANT: Boolean (not String "false")
+            "isApproved" to false, // IMPORTANT: Boolean (not String "false")
+            "latitude" to selectedLocation!!.latitude,
+            "longitude" to selectedLocation!!.longitude
         )
 
         submitButton.isEnabled = false // Prevent double clicking

@@ -7,6 +7,8 @@ data class Race(
     var date: String = "",
     var distance: String = "",
     var website: String = "",
+    var latitude: Double = 0.0,
+    var longitude: Double = 0.0,
 
     @get:PropertyName("isApproved")
     @set:PropertyName("isApproved")

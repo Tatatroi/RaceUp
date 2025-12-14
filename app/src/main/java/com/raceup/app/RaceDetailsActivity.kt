@@ -10,8 +10,15 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import androidx.cardview.widget.CardView
 
-class RaceDetailsActivity : AppCompatActivity() {
+class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -26,6 +33,11 @@ class RaceDetailsActivity : AppCompatActivity() {
     private lateinit var adminPanel: LinearLayout
     private lateinit var btnApprove: Button
     private lateinit var btnReject: Button
+
+    private lateinit var mapCard: CardView
+    private var raceLat: Double = 0.0
+    private var raceLng: Double = 0.0
+    private var mapReady: GoogleMap? = null
 
     // ADMIN CONFIGURATION
     private val ADMIN_EMAIL = "mihai@vaidos.com" // <--- CHANGE THIS!
@@ -43,6 +55,7 @@ class RaceDetailsActivity : AppCompatActivity() {
         adminPanel = findViewById(R.id.adminPanel)
         btnApprove = findViewById(R.id.btnApprove)
         btnReject = findViewById(R.id.btnReject)
+        mapCard = findViewById(R.id.mapCard)
 
         // 2. Get Race ID
         raceId = intent.getStringExtra("raceId")
@@ -52,11 +65,21 @@ class RaceDetailsActivity : AppCompatActivity() {
             return
         }
 
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.detailsMapFragment) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
         // 3. Load Data
         loadRaceDetails()
 
         // 4. Setup User vs Admin vs Guest Logic
         setupPermissions()
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mapReady = googleMap
+        // If data loaded first, update the map now
+        updateMapLocation()
     }
 
     private fun setupPermissions() {
@@ -97,6 +120,10 @@ class RaceDetailsActivity : AppCompatActivity() {
                     dateText.text = race.date
                     distanceText.text = race.distance
                     websiteText.text = race.website
+                    raceLat = race.latitude
+                    raceLng = race.longitude
+
+                    updateMapLocation()
 
                     // 2. ADMIN LOGIC: Check status to show/hide buttons
                     val user = auth.currentUser
@@ -133,6 +160,24 @@ class RaceDetailsActivity : AppCompatActivity() {
                 }
             }
     }
+
+    private fun updateMapLocation() {
+        if (mapReady != null && raceLat != 0.0 && raceLng != 0.0) {
+            mapCard.visibility = View.VISIBLE
+
+            val location = LatLng(raceLat, raceLng)
+            mapReady?.clear()
+            mapReady?.addMarker(MarkerOptions().position(location).title("Race Start"))
+            mapReady?.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
+
+            // Enable basic controls
+            mapReady?.uiSettings?.isZoomControlsEnabled = true
+        } else {
+            // Hide map if no location data exists (e.g. old races)
+            mapCard.visibility = View.GONE
+        }
+    }
+
     private fun deleteRace() {
         db.collection("races").document(raceId!!)
             .delete()
@@ -141,7 +186,7 @@ class RaceDetailsActivity : AppCompatActivity() {
                 finish()
             }
     }
-    
+
 
     private fun toggleFavorite() {
         val uid = auth.currentUser?.uid ?: return
