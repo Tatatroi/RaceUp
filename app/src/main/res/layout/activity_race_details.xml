@@ -1,72 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
-    android:background="#FAFAFA">
+    android:background="#F5F5F5">
 
-    <LinearLayout
+    <View
+        android:id="@+id/headerBackground"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/teal_700"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/detailRaceName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:text="Race Name"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/headerBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/infoCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!-- Race Name -->
-        <TextView
-            android:id="@+id/detailRaceName"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@+id/headerBackground"
+        app:layout_constraintBottom_toBottomOf="@+id/headerBackground">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Race Name"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:paddingBottom="8dp" />
+            android:orientation="vertical"
+            android:padding="24dp">
 
-        <!-- Date -->
-        <TextView
-            android:id="@+id/detailRaceDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Date"
-            android:textSize="18sp"
-            android:textColor="#444444"
-            android:paddingBottom="6dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DATE"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/teal_700"/>
+            <TextView
+                android:id="@+id/detailRaceDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12 Oct 2024"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="16dp"/>
 
-        <!-- Distance -->
-        <TextView
-            android:id="@+id/detailRaceDistance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Distance"
-            android:textSize="18sp"
-            android:textColor="#444444"
-            android:paddingBottom="6dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DISTANCE"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/teal_700"/>
+            <TextView
+                android:id="@+id/detailRaceDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="42 km"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="16dp"/>
 
-        <!-- Website -->
-        <TextView
-            android:id="@+id/detailRaceWebsite"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Website"
-            android:textSize="18sp"
-            android:textColor="#2962FF"
-            android:autoLink="web"
-            android:paddingBottom="20dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WEBSITE"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/teal_700"/>
+            <TextView
+                android:id="@+id/detailRaceWebsite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="www.marathon.com"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:autoLink="web"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-        <!-- Add to Favorites Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnFavorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:src="@drawable/ic_location_on_24"
+        app:backgroundTint="@color/white"
+        app:tint="@color/teal_700"
+        app:layout_constraintBottom_toTopOf="@+id/infoCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/infoCard" />
+    <LinearLayout
+        android:id="@+id/adminPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:weightSum="2"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent">
+
         <Button
-            android:id="@+id/addFavoriteButton"
-            android:layout_width="match_parent"
+            android:id="@+id/btnReject"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Add to Favorites"
-            android:padding="12dp"
-            android:textSize="18sp"
-            android:backgroundTint="#FF4081"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:stateListAnimator="@null" />
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="#D32F2F"
+            android:text="Reject / Delete" />
 
+        <Button
+            android:id="@+id/btnApprove"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#388E3C"
+            android:text="Approve Race" />
     </LinearLayout>
 
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
