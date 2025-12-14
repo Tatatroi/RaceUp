@@ -70,7 +70,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.appcompat)
     implementation("com.google.android.gms:play-services-maps:19.2.0")
-
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 //    implementation(platform(libs.firebase.bom))
 //    implementation(libs.firebase.auth.ktx)
 //    implementation(libs.firebase.firestore.ktx)
