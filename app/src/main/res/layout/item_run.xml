@@ -36,15 +36,28 @@
             app:layout_constraintBottom_toBottomOf="@+id/iconBg"/>
 
         <TextView
+            android:id="@+id/tvRaceName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Berlin Marathon"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toEndOf="@+id/iconBg"
+            app:layout_constraintEnd_toStartOf="@+id/tvTime"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Oct 24, 2023"
             android:textSize="12sp"
             android:textColor="@color/text_secondary"
-            android:layout_marginStart="16dp"
-            app:layout_constraintStart_toEndOf="@+id/iconBg"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintStart_toStartOf="@+id/tvRaceName"
+            app:layout_constraintTop_toBottomOf="@+id/tvRaceName"/>
 
         <TextView
             android:id="@+id/tvDistance"
@@ -54,17 +67,17 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
-            android:layout_marginStart="16dp"
-            app:layout_constraintStart_toEndOf="@+id/iconBg"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@+id/tvRaceName"
             app:layout_constraintTop_toBottomOf="@+id/tvDate"/>
 
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Time: 25:30"
+            android:text="25:30"
             android:textSize="14sp"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/text_primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -77,8 +90,7 @@
             android:textStyle="bold"
             android:textColor="@color/brand_accent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTime"
-            android:layout_marginTop="4dp"/>
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

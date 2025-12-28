@@ -32,6 +32,7 @@ class RunTrackerActivity : AppCompatActivity() {
     private var raceId: String? = null
     private var currentSeconds = 0L
     private var currentDistanceMeters = 0.0
+    private var raceName: String = "Unknown Race"
 
     // State Flag
     private var isRunStarted = false
@@ -52,6 +53,17 @@ class RunTrackerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_run_tracker)
 
         raceId = intent.getStringExtra("RACE_ID")
+
+        if (raceId != null) {
+            FirebaseFirestore.getInstance().collection("races").document(raceId!!)
+                .get()
+                .addOnSuccessListener { doc ->
+                    if (doc.exists()) {
+                        raceName = doc.getString("name") ?: "Virtual Race"
+                        findViewById<TextView>(R.id.tvRaceTitle).text = raceName
+                    }
+                }
+        }
 
         tvTimer = findViewById(R.id.tvTimer)
         tvDistance = findViewById(R.id.tvDistance)
@@ -163,6 +175,7 @@ class RunTrackerActivity : AppCompatActivity() {
 
         val runData = hashMapOf(
             "raceId" to (raceId ?: "unknown"),
+            "raceName" to raceName,
             "userId" to uid,
             "date" to java.util.Date(),
             "durationSeconds" to currentSeconds,
