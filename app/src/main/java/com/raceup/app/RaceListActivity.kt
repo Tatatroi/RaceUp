@@ -9,11 +9,11 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -25,16 +25,17 @@ class RaceListActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
     private lateinit var btnSort: ImageButton
     private lateinit var emptyView: LinearLayout
+    private lateinit var filterChipGroup: ChipGroup // <--- NEW
 
-    // We need TWO lists:
-    // 1. The full data from DB
-    // 2. The filtered data currently shown
     private val allRacesList = mutableListOf<Race>()
     private val displayList = mutableListOf<Race>()
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private var listenerRegistration: ListenerRegistration? = null
+
+    // Tracks the active filter
+    private var selectedDistanceFilter: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,11 +46,10 @@ class RaceListActivity : AppCompatActivity() {
         searchEditText = findViewById(R.id.searchEditText)
         btnSort = findViewById(R.id.btnSort)
         emptyView = findViewById(R.id.emptyView)
+        filterChipGroup = findViewById(R.id.filterChipGroup) // <--- NEW
         val addRaceButton = findViewById<View>(R.id.addRaceButton)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-
-        // Adapter uses displayList (the filtered one)
         adapter = RaceAdapter(displayList) { race ->
             val intent = Intent(this, RaceDetailsActivity::class.java)
             intent.putExtra("raceId", race.id)
@@ -57,51 +57,96 @@ class RaceListActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
-        // Guest Mode Logic
-        if (auth.currentUser == null) {
-            addRaceButton.visibility = View.GONE
-        } else {
-            addRaceButton.visibility = View.VISIBLE
-            addRaceButton.setOnClickListener {
-                startActivity(Intent(this, RaceFormActivity::class.java))
-            }
+        // Setup Buttons
+        if (auth.currentUser == null) addRaceButton.visibility = View.GONE
+        else addRaceButton.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    RaceFormActivity::class.java
+                )
+            )
         }
 
-        // Admin Review Logic
         val showPending = intent.getBooleanExtra("SHOW_PENDING", false)
         if (showPending) {
             findViewById<TextView>(R.id.tvTitle).text = "Pending Approvals"
-            // Hide search/sort in admin review to keep it simple, or keep them if you want
             searchEditText.visibility = View.GONE
             btnSort.visibility = View.GONE
+            // Hide filters in admin mode
+            findViewById<View>(R.id.chipScrollView).visibility = View.GONE
         }
 
-        // Load Data
         loadRacesLive(showPending)
 
-        // SEARCH LOGIC
+        // --- SEARCH LISTENER ---
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                filter(s.toString())
-            }
+                applyFilters()
+            } // Changed to call applyFilters
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // SORT LOGIC
-        btnSort.setOnClickListener {
-            showSortDialog()
+        // --- SORT LISTENER ---
+        btnSort.setOnClickListener { showSortDialog() }
+
+        // --- NEW: CHIP LISTENER ---
+        filterChipGroup.setOnCheckedChangeListener { group, checkedId ->
+            if (checkedId == View.NO_ID) {
+                // Nothing selected
+                selectedDistanceFilter = null
+            } else {
+                // Something selected, figure out which one
+                when (checkedId) {
+                    R.id.chip5k -> selectedDistanceFilter = "5" // Will match "5 km"
+                    R.id.chip10k -> selectedDistanceFilter = "10"
+                    R.id.chip21k -> selectedDistanceFilter = "21" // Matches 21.1 km
+                    R.id.chip42k -> selectedDistanceFilter = "42" // Matches 42.2 km
+                }
+            }
+            // Re-run the filter with new chip setting
+            applyFilters()
         }
+    }
+
+    // --- THE MAIN FILTER FUNCTION ---
+    private fun applyFilters() {
+        val searchText = searchEditText.text.toString().lowercase().trim()
+
+        displayList.clear()
+
+        for (race in allRacesList) {
+            // 1. Check Text
+            val matchesText = if (searchText.isEmpty()) true else {
+                race.name.lowercase().contains(searchText) ||
+                        race.distance.lowercase().contains(searchText)
+            }
+
+            // 2. Check Chip
+            // The race distance string looks like "5 km, 10 km, 21.1 km"
+            // We check if it contains our filter key (e.g., "10")
+            val matchesChip = if (selectedDistanceFilter == null) true else {
+                race.distance.contains(selectedDistanceFilter!!)
+            }
+
+            // Add ONLY if both are true
+            if (matchesText && matchesChip) {
+                displayList.add(race)
+            }
+        }
+
+        adapter.notifyDataSetChanged()
+        updateEmptyView()
     }
 
     private fun loadRacesLive(showPending: Boolean) {
         val targetStatus = !showPending
-
         listenerRegistration = db.collection("races")
             .whereEqualTo("isApproved", targetStatus)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) return@addSnapshotListener
-
                 if (snapshot != null) {
                     allRacesList.clear()
                     for (doc in snapshot.documents) {
@@ -109,36 +154,14 @@ class RaceListActivity : AppCompatActivity() {
                         race?.id = doc.id
                         if (race != null) allRacesList.add(race)
                     }
-                    // Initially, display everything
-                    displayList.clear()
-                    displayList.addAll(allRacesList)
-                    adapter.notifyDataSetChanged()
-
-                    updateEmptyView()
+                    applyFilters() // Apply filters immediately after loading
                 }
             }
     }
 
-    private fun filter(text: String) {
-        displayList.clear()
-        if (text.isEmpty()) {
-            displayList.addAll(allRacesList)
-        } else {
-            val query = text.lowercase()
-            for (race in allRacesList) {
-                if (race.name.lowercase().contains(query) || race.distance.lowercase().contains(query)) {
-                    displayList.add(race)
-                }
-            }
-        }
-        adapter.notifyDataSetChanged()
-
-        updateEmptyView()
-    }
-
+    // ... (Keep your existing showSortDialog, parseDate, updateEmptyView, onDestroy) ...
     private fun showSortDialog() {
         val options = arrayOf("Name (A-Z)", "Date (Newest First)", "Date (Oldest First)")
-
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Sort By")
         builder.setItems(options) { _, which ->
@@ -152,19 +175,15 @@ class RaceListActivity : AppCompatActivity() {
         builder.show()
     }
 
-    // Helper to parse your date string "dd/MM/yyyy" for sorting
     private fun parseDate(dateString: String): Long {
         return try {
             val parts = dateString.split("/")
-            // format: YYYYMMDD for easy number comparison
             val year = parts[2].toInt()
             val month = parts[1].toInt()
             val day = parts[0].toInt()
-
-            // Return a comparable number (timestamp or just huge int)
             (year * 10000 + month * 100 + day).toLong()
         } catch (e: Exception) {
-            0L // If date is weird, put it at the end/start
+            0L
         }
     }
 
