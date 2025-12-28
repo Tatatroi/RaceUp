@@ -21,6 +21,17 @@ android {
     namespace = "com.raceup.app"
     compileSdk = 36
 
+//    defaultConfig {
+//        applicationId = "com.raceup.app"
+//        minSdk = 26
+//        targetSdk = 36
+//        versionCode = 1
+//        versionName = "1.0"
+//
+//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+//        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY") ?: ""
+//        buildConfigField("String", "WEATHER_API_KEY", "\"${localProperties.getProperty("WEATHER_API_KEY")}\"")
+//    }
     defaultConfig {
         applicationId = "com.raceup.app"
         minSdk = 26
@@ -29,7 +40,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY") ?: ""
+
+        // LOAD KEYS
+        val mapsKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
+        val weatherKey = localProperties.getProperty("WEATHER_API_KEY") ?: ""
+
+        // Pass them to the app
+        manifestPlaceholders["MAPS_API_KEY"] = mapsKey
+        buildConfigField("String", "WEATHER_API_KEY", "\"$weatherKey\"")
     }
 
     buildTypes {
@@ -50,6 +68,8 @@ android {
     }
     buildFeatures {
         compose = false
+        viewBinding = true
+        buildConfig = true
     }
     // Trebuie adăugată această secțiune pentru a specifica unde se află compilatorul Compose
     composeOptions {
@@ -89,7 +109,10 @@ dependencies {
 //    implementation(libs.firebase.auth.ktx)
 //    implementation(libs.firebase.firestore.ktx)
 
-
+    // Networking (Retrofit) - The standard for Android
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
     // Dependențe de testare
     testImplementation(libs.junit)

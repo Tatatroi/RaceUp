@@ -16,30 +16,28 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/welcomeLabel"
+        android:id="@+id/userEmailText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:text="runner@example.com"
+        android:textColor="@color/white_opacity_70"
+        android:textSize="14sp"
         android:layout_marginTop="48dp"
-        android:text="Welcome back,"
-        android:textColor="#CCFFFFFF"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-light"
+        android:layout_marginStart="24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/welcomeTextView"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="Runner!"
+        android:text="Welcome,\nRunner"
         android:textColor="@color/white"
-        android:textSize="34sp"
+        android:textSize="32sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/logoutButton"
-        app:layout_constraintStart_toStartOf="@+id/welcomeLabel"
-        app:layout_constraintTop_toBottomOf="@+id/welcomeLabel" />
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@+id/userEmailText"
+        app:layout_constraintTop_toBottomOf="@+id/userEmailText" />
 
     <ImageButton
         android:id="@+id/logoutButton"
