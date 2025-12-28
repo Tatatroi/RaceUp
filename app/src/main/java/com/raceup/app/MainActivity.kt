@@ -23,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cardAdmin: CardView
     private lateinit var cardMap: CardView
     private lateinit var cardJoinRace: CardView
+    private lateinit var cardHistory: CardView
+
 
     private val authManager = FirebaseAuthManager()
 
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         cardAdmin = findViewById(R.id.cardAdmin)
         cardMap = findViewById(R.id.cardMap)
         cardJoinRace = findViewById(R.id.cardJoinRace)
+        cardHistory = findViewById(R.id.cardHistory)
 
         // 2. Setup User Info
         val currentUser = authManager.currentUser()
@@ -122,6 +125,11 @@ class MainActivity : AppCompatActivity() {
 
         cardJoinRace.setOnClickListener {
             val intent = Intent(this, RaceLobbyActivity::class.java)
+            startActivity(intent)
+        }
+
+        cardHistory.setOnClickListener {
+            val intent = Intent(this, RunHistoryActivity::class.java)
             startActivity(intent)
         }
     }

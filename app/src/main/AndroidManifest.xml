@@ -68,6 +68,9 @@
             android:name=".RaceLobbyActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".RunHistoryActivity"
+            android:exported="false" />
 
         <service
             android:name=".RunService"
