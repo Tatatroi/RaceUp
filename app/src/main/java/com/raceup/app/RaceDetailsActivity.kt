@@ -12,6 +12,7 @@ import java.util.Locale
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -148,6 +149,20 @@ class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     updateMapLocation()
 
+                    val codeTextView = findViewById<TextView>(R.id.raceCodeText)
+                    val btnCopy = findViewById<ImageView>(R.id.btnCopyCode)
+
+                    codeTextView.text = race.raceCode
+
+                    // Click to Copy Logic
+                    btnCopy.setOnClickListener {
+                        val clipboard =
+                            getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                        val clip = android.content.ClipData.newPlainText("Race Code", race.raceCode)
+                        clipboard.setPrimaryClip(clip)
+                        Toast.makeText(this, "Code copied!", Toast.LENGTH_SHORT).show()
+                    }
+
                     // NEW: Fetch Weather if we have coordinates
                     if (raceLat != 0.0 && raceLng != 0.0) {
                         fetchWeather(raceLat, raceLng)
@@ -253,7 +268,12 @@ class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Use a Coroutine to fetch data in the background
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = WeatherNetwork.api.getCurrentWeather(lat, lon, "metric", BuildConfig.WEATHER_API_KEY)
+                val response = WeatherNetwork.api.getCurrentWeather(
+                    lat,
+                    lon,
+                    "metric",
+                    BuildConfig.WEATHER_API_KEY
+                )
 
                 // Switch back to Main Thread to update UI
                 withContext(Dispatchers.Main) {
@@ -304,7 +324,6 @@ class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         runScoreText.setTextColor(Color.WHITE)
         scoreCard.setCardBackgroundColor(color)
     }
-
 
     private fun approveRace() {
         db.collection("races").document(raceId!!)
@@ -368,9 +387,17 @@ class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         val testTime = System.currentTimeMillis() + 10000 // 10 seconds
-        scheduleSingleNotification(alarmManager, testTime, "Test Title", "Test Message", race.id, 99)
+        scheduleSingleNotification(
+            alarmManager,
+            testTime,
+            "Test Title",
+            "Test Message",
+            race.id,
+            99
+        )
 
-        Toast.makeText(this, "Reminders set for 3 days before and race day.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Reminders set for 3 days before and race day.", Toast.LENGTH_SHORT)
+            .show()
     }
 
     private fun scheduleSingleNotification(

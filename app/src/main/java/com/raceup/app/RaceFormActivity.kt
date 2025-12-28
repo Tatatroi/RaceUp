@@ -177,6 +177,11 @@ class RaceFormActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
+        val allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        val uniqueCode = (1..6)
+            .map { allowedChars.random() }
+            .joinToString("")
+
         val db = FirebaseFirestore.getInstance()
         val docRef = db.collection("races").document()
 
@@ -188,7 +193,8 @@ class RaceFormActivity : AppCompatActivity(), OnMapReadyCallback {
             "website" to website,
             "isApproved" to false,
             "latitude" to selectedLocation!!.latitude,
-            "longitude" to selectedLocation!!.longitude
+            "longitude" to selectedLocation!!.longitude,
+            "raceCode" to uniqueCode
         )
 
         submitButton.isEnabled = false
