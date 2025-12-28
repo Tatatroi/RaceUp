@@ -42,10 +42,15 @@ class LoginActivity : AppCompatActivity() {
 
             FirebaseAuthManager().loginUser(email, password) { success, errorMessage ->
                 if (success) {
-                    Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-                    goToMainActivity()
+                    // OLD: Toast.makeText(this, "Welcome, $email", Toast.LENGTH_SHORT).show()
+
+                    // NEW: Just show the email
+                    Toast.makeText(this, email, Toast.LENGTH_SHORT).show()
+
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
                 } else {
-                    Toast.makeText(this, "Error: $errorMessage", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Login failed: $errorMessage", Toast.LENGTH_SHORT).show()
                 }
             }
         }

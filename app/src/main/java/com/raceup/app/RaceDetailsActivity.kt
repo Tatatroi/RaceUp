@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -25,6 +26,11 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import androidx.cardview.widget.CardView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.raceup.app.BuildConfig
 
 class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -41,6 +47,11 @@ class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var adminPanel: LinearLayout
     private lateinit var btnApprove: Button
     private lateinit var btnReject: Button
+
+    private lateinit var weatherTempText: TextView
+    private lateinit var weatherDescText: TextView
+    private lateinit var runScoreText: TextView
+    private lateinit var scoreCard: CardView
 
     private lateinit var mapCard: CardView
     private var raceLat: Double = 0.0
@@ -64,6 +75,10 @@ class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         btnApprove = findViewById(R.id.btnApprove)
         btnReject = findViewById(R.id.btnReject)
         mapCard = findViewById(R.id.mapCard)
+        weatherTempText = findViewById(R.id.weatherTempText)
+        weatherDescText = findViewById(R.id.weatherDescText)
+        runScoreText = findViewById(R.id.runScoreText)
+        scoreCard = findViewById(R.id.scoreCard)
 
         // 2. Get Race ID
         raceId = intent.getStringExtra("raceId")
@@ -132,6 +147,15 @@ class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                     raceLng = race.longitude
 
                     updateMapLocation()
+
+                    // NEW: Fetch Weather if we have coordinates
+                    if (raceLat != 0.0 && raceLng != 0.0) {
+                        fetchWeather(raceLat, raceLng)
+                    } else {
+                        // Handle case with no location data
+                        weatherDescText.text = "No location data"
+                        runScoreText.text = "N/A"
+                    }
 
                     // 2. ADMIN LOGIC: Check status to show/hide buttons
                     val user = auth.currentUser
@@ -224,6 +248,63 @@ class RaceDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
+    private fun fetchWeather(lat: Double, lon: Double) {
+        // Use a Coroutine to fetch data in the background
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = WeatherNetwork.api.getCurrentWeather(lat, lon, "metric", BuildConfig.WEATHER_API_KEY)
+
+                // Switch back to Main Thread to update UI
+                withContext(Dispatchers.Main) {
+                    updateWeatherUI(response)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    weatherDescText.text = "Weather unavailable"
+                }
+            }
+        }
+    }
+
+    private fun updateWeatherUI(weather: WeatherResponse) {
+        val temp = weather.main.temp
+        val condition = weather.weather.firstOrNull()?.main ?: "Clear"
+
+        weatherTempText.text = "${temp.toInt()}°C"
+        weatherDescText.text = condition
+
+        // --- RUN SCORE LOGIC ---
+        var score = "MEDIUM"
+        var color = Color.parseColor("#FF9800") // Orange
+
+        // 1. Temperature Check
+        val isTempGood = temp in 8.0..20.0
+        val isTempOk = temp in 5.0..25.0
+
+        // 2. Condition Check
+        val isRaining = condition.contains("Rain", ignoreCase = true)
+        val isSnowing = condition.contains("Snow", ignoreCase = true)
+
+        if (isTempGood && !isRaining && !isSnowing) {
+            score = "EXCELLENT"
+            color = Color.parseColor("#4CAF50") // Green
+        } else if (isTempOk && !isSnowing) {
+            score = "GOOD"
+            color = Color.parseColor("#8BC34A") // Light Green
+        } else if (temp > 28.0 || temp < 0.0 || isSnowing) {
+            score = "POOR"
+            color = Color.parseColor("#F44336") // Red
+        } else {
+            score = "MEDIUM" // Default
+        }
+
+        runScoreText.text = "RUN LEVEL: $score"
+        runScoreText.setTextColor(Color.WHITE)
+        scoreCard.setCardBackgroundColor(color)
+    }
+
 
     private fun approveRace() {
         db.collection("races").document(raceId!!)
