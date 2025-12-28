@@ -23,6 +23,7 @@
         android:textColor="@color/white_opacity_70"
         android:textSize="14sp"
         android:layout_marginTop="48dp"
+        android:fontFamily="sans-serif-light"
         android:layout_marginStart="24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -46,19 +47,19 @@
         android:layout_marginTop="48dp"
         android:layout_marginEnd="24dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_chevron_right_24"
         android:rotation="180"
-        app:tint="@color/white"
+        android:src="@drawable/ic_chevron_right_24"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
 
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="-80dp"
+        android:clipToPadding="false"
         android:columnCount="2"
         android:padding="16dp"
-        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerBg">
 
@@ -69,10 +70,10 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
+            android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="@color/card_bg"
-            android:foreground="?attr/selectableItemBackground">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -89,13 +90,14 @@
                     android:padding="14dp"
                     android:src="@drawable/ic_calendar_today_24"
                     app:tint="@color/brand_primary" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Race Calendar"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"/>
+                    android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -106,10 +108,10 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
+            android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="@color/card_bg"
-            android:foreground="?attr/selectableItemBackground">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -131,9 +133,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="My Favorites"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"/>
+                    android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -144,10 +146,10 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
+            android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="@color/card_bg"
-            android:foreground="?attr/selectableItemBackground">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -169,9 +171,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Suggest Race"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"/>
+                    android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -182,10 +184,10 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
+            android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="@color/card_bg"
-            android:foreground="?attr/selectableItemBackground">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -202,13 +204,60 @@
                     android:padding="14dp"
                     android:src="@drawable/ic_location_on_24"
                     app:tint="@color/brand_primary" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Map View"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"/>
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardJoinRace"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/bg_circle_light"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_chevron_right_24"
+                    app:tint="@color/brand_accent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Join Race"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Enter Code"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -219,11 +268,11 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
+            android:foreground="?attr/selectableItemBackground"
             android:visibility="gone"
+            app:cardBackgroundColor="@color/card_bg"
             app:cardCornerRadius="20dp"
             app:cardElevation="8dp"
-            app:cardBackgroundColor="@color/card_bg"
-            android:foreground="?attr/selectableItemBackground"
             tools:visibility="visible">
 
             <LinearLayout
@@ -246,9 +295,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Admin Panel"
+                    android:textColor="@color/brand_accent"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/brand_accent"/>
+                    android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </GridLayout>
