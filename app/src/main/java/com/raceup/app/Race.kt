@@ -9,6 +9,7 @@ data class Race(
     var website: String = "",
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
+    var raceCode: String = "",
 
     @get:PropertyName("isApproved")
     @set:PropertyName("isApproved")
