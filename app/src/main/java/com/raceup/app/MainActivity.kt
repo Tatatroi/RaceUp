@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.raceup.app.firebase.FirebaseAuthManager
-
+import android.widget.ImageView
 class MainActivity : AppCompatActivity() {
 
     private lateinit var logoutButton: ImageButton
@@ -54,11 +54,20 @@ class MainActivity : AppCompatActivity() {
         // 2. Setup User Info
         val currentUser = authManager.currentUser()
 
-        if (currentUser != null) {
-            userEmailText.text = currentUser.email
+    val btnProfile = findViewById<View>(R.id.btnProfile)
+    btnProfile.setOnClickListener {
+        // Check if user is logged in before opening profile (Optional but recommended)
+        if (authManager.currentUser() != null) {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Please log in to view profile", Toast.LENGTH_SHORT).show()
+        }
+    }
 
-//        val emailName = currentUser.email?.substringBefore("@") ?: "Runner"
-            welcomeTextView.text = "Welcome, \n"
+    if (currentUser != null) {
+        userEmailText.text = currentUser.email
+        welcomeTextView.text = "Welcome, \n"
 
             val db = FirebaseFirestore.getInstance()
             db.collection("users").document(currentUser.uid)
@@ -68,14 +77,32 @@ class MainActivity : AppCompatActivity() {
                         val firstName = document.getString("firstName")
                         val lastName = document.getString("lastName")
 
-                        if (!firstName.isNullOrEmpty()) {
-                            welcomeTextView.text = "Welcome,\n$firstName $lastName"
+                    if (!firstName.isNullOrEmpty()) {
+                        welcomeTextView.text = "Welcome,\n$firstName $lastName"
+                    }
+
+                    // --- 2. SET IMAGE (NEW CODE HERE) ---
+                    val localPath = document.getString("localImagePath")
+                    if (!localPath.isNullOrEmpty()) {
+                        val imgProfileIcon = findViewById<ImageView>(R.id.imgProfileIcon)
+                        try {
+                            imgProfileIcon.setImageURI(android.net.Uri.parse(localPath))
+
+                            // --- ADD THIS LINE TO FIX THE WHITE CIRCLE ---
+                            imgProfileIcon.imageTintList = null
+                            // ---------------------------------------------
+
+                            imgProfileIcon.scaleType = ImageView.ScaleType.CENTER_CROP
+                            imgProfileIcon.setPadding(0,0,0,0)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
                     }
                 }
-        } else {
-            welcomeTextView.text = "Welcome,\nGuest"
-        }
+            }
+    } else {
+        welcomeTextView.text = "Welcome,\nGuest"
+    }
 
         // 3. LOGOUT LOGIC
         logoutButton.setOnClickListener {
