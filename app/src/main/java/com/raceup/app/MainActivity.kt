@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cardSuggest: CardView
     private lateinit var cardAdmin: CardView
     private lateinit var cardMap: CardView
+    private lateinit var cardGroups: CardView
     private lateinit var cardJoinRace: CardView
     private lateinit var cardHistory: CardView
 
@@ -47,6 +48,8 @@ class MainActivity : AppCompatActivity() {
         cardMap = findViewById(R.id.cardMap)
         cardJoinRace = findViewById(R.id.cardJoinRace)
         cardHistory = findViewById(R.id.cardHistory)
+        cardGroups = findViewById(R.id.cardGroups)
+
 
         // 2. Setup User Info
         val currentUser = authManager.currentUser()
@@ -108,6 +111,15 @@ class MainActivity : AppCompatActivity() {
             cardFavorites.visibility = View.VISIBLE
             cardFavorites.setOnClickListener {
                 startActivity(Intent(this, FavoritesActivity::class.java))
+            }
+        }
+
+        if (currentUser == null) {
+            cardGroups.visibility = View.GONE
+        } else {
+            cardGroups.visibility = View.VISIBLE
+            cardGroups.setOnClickListener {
+                startActivity(Intent(this, GroupsActivity::class.java))
             }
         }
 
