@@ -25,7 +25,6 @@ import java.util.Calendar
 
 class RegisterActivity : AppCompatActivity() {
 
-    // --- 1. DECLARE VARIABLES HERE (At the top of the class) ---
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var confirmPasswordEditText: EditText
@@ -53,7 +52,6 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        // --- 2. INITIALIZE VIEWS ---
         emailEditText = findViewById(R.id.emailRegisterEditText)
         passwordEditText = findViewById(R.id.passwordRegisterEditText)
         confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText)
@@ -61,7 +59,6 @@ class RegisterActivity : AppCompatActivity() {
         lastNameEditText = findViewById(R.id.lastNameEditText)
 
         birthDateEditText = findViewById(R.id.birthDateEditText)
-        // Date Picker settings
         birthDateEditText.isFocusable = false
         birthDateEditText.isClickable = true
 
@@ -71,18 +68,15 @@ class RegisterActivity : AppCompatActivity() {
         loginRedirect = findViewById(R.id.loginRedirect)
         profileImageView = findViewById(R.id.profileImageView)
 
-        // Setup Image Picker Click
         profileImageView.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
 
-        // Setup Gender Spinner
         val genderOptions = arrayOf("Pick your gender", "Male", "Female")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, genderOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         genderSpinner.adapter = adapter
 
-        // --- 3. REGISTER BUTTON LOGIC ---
         registerButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
@@ -92,7 +86,6 @@ class RegisterActivity : AppCompatActivity() {
             val birthDate = birthDateEditText.text.toString().trim()
             val gender = genderSpinner.selectedItem.toString()
 
-            // Validations
             if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -108,10 +101,8 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Register with Firebase
             FirebaseAuthManager().registerUser(email, password) { success, errorMessage ->
                 if (success) {
-                    // FIX: Use the direct instance to get the UID safely
                     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
                     if (currentUserId != null) {
@@ -121,7 +112,6 @@ class RegisterActivity : AppCompatActivity() {
                                 saveImageToInternalStorage(currentUserId, selectedImageUri!!)
                         }
 
-                        // Save extra info to Firestore
                         FirebaseFirestoreManager().saveUserExtraData(
                             currentUserId,
                             firstName,
@@ -134,7 +124,6 @@ class RegisterActivity : AppCompatActivity() {
                         Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT)
                             .show()
 
-                        // Clear back stack and go to Login
                         val intent = Intent(this, LoginActivity::class.java)
                         intent.flags =
                             Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -149,12 +138,10 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        // Login Redirect
         loginRedirect.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
 
-        // Date Picker Click
         birthDateEditText.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)

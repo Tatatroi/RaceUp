@@ -16,7 +16,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var logoutButton: ImageButton
     private lateinit var welcomeTextView: TextView
 
-    // Dashboard Cards
     private lateinit var cardCalendar: CardView
     private lateinit var cardFavorites: CardView
     private lateinit var cardSuggest: CardView
@@ -29,14 +28,12 @@ class MainActivity : AppCompatActivity() {
 
     private val authManager = FirebaseAuthManager()
 
-    // Replace this with your actual Admin email
     val ADMIN_EMAIL = "mihai@vaidos.com"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. Initialize Views
         val logoutButton: View = findViewById(R.id.logoutButton)
         welcomeTextView = findViewById(R.id.welcomeTextView)
         val userEmailText: TextView = findViewById(R.id.userEmailText)
@@ -51,12 +48,10 @@ class MainActivity : AppCompatActivity() {
         cardGroups = findViewById(R.id.cardGroups)
 
 
-        // 2. Setup User Info
         val currentUser = authManager.currentUser()
 
     val btnProfile = findViewById<View>(R.id.btnProfile)
     btnProfile.setOnClickListener {
-        // Check if user is logged in before opening profile (Optional but recommended)
         if (authManager.currentUser() != null) {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
@@ -81,17 +76,12 @@ class MainActivity : AppCompatActivity() {
                         welcomeTextView.text = "Welcome,\n$firstName $lastName"
                     }
 
-                    // --- 2. SET IMAGE (NEW CODE HERE) ---
                     val localPath = document.getString("localImagePath")
                     if (!localPath.isNullOrEmpty()) {
                         val imgProfileIcon = findViewById<ImageView>(R.id.imgProfileIcon)
                         try {
                             imgProfileIcon.setImageURI(android.net.Uri.parse(localPath))
-
-                            // --- ADD THIS LINE TO FIX THE WHITE CIRCLE ---
                             imgProfileIcon.imageTintList = null
-                            // ---------------------------------------------
-
                             imgProfileIcon.scaleType = ImageView.ScaleType.CENTER_CROP
                             imgProfileIcon.setPadding(0,0,0,0)
                         } catch (e: Exception) {
@@ -104,7 +94,6 @@ class MainActivity : AppCompatActivity() {
         welcomeTextView.text = "Welcome,\nGuest"
     }
 
-        // 3. LOGOUT LOGIC
         logoutButton.setOnClickListener {
             authManager.logout()
             Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
@@ -113,7 +102,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // 4. CLICK LISTENERS
         cardMap.setOnClickListener {
             startActivity(Intent(this, MapExplorerActivity::class.java))
         }
@@ -122,7 +110,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, RaceListActivity::class.java))
         }
 
-        // Suggest Race (Hidden for Guests)
         if (currentUser == null) {
             cardSuggest.visibility = View.GONE
         } else {
@@ -131,7 +118,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Favorites (Hidden for Guests)
         if (currentUser == null) {
             cardFavorites.visibility = View.GONE
         } else {
@@ -150,7 +136,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 5. ADMIN LOGIC
         if (currentUser?.email == ADMIN_EMAIL) {
             cardAdmin.visibility = View.VISIBLE
             cardAdmin.setOnClickListener {

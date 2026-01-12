@@ -19,7 +19,7 @@ class GroupsActivity : AppCompatActivity() {
     private val db = FirebaseFirestore.getInstance()
     private val currentUser = FirebaseAuth.getInstance().currentUser
     private lateinit var recyclerView: RecyclerView
-    private lateinit var textNoGroups: TextView // 1. Variable for the text
+    private lateinit var textNoGroups: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +28,6 @@ class GroupsActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerGroups)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // 2. Find the text view by ID
         textNoGroups = findViewById(R.id.statusText)
 
         val btnCreateGroup = findViewById<Button>(R.id.btnCreateGroup)
@@ -57,17 +56,13 @@ class GroupsActivity : AppCompatActivity() {
                     }
                 }
 
-                // --- NEW LOGIC: Toggle Visibility ---
                 if (groupList.isEmpty()) {
-                    // List is empty -> Show Text, Hide List
                     textNoGroups.visibility = View.VISIBLE
                     recyclerView.visibility = View.GONE
                 } else {
-                    // List has items -> Hide Text, Show List
                     textNoGroups.visibility = View.GONE
                     recyclerView.visibility = View.VISIBLE
                 }
-                // ------------------------------------
 
                 recyclerView.adapter = GroupsAdapter(groupList) { selectedGroup ->
                     val intent = Intent(this, GroupDetailsActivity::class.java)
@@ -96,7 +91,6 @@ class GroupsActivity : AppCompatActivity() {
     private fun createGroupInFirestore(groupName: String) {
         if (currentUser == null) return
 
-        // Save current time so new groups work with the leaderboard immediately
         val timestamp = System.currentTimeMillis()
 
         val newGroupRef = db.collection("groups").document()
@@ -105,7 +99,7 @@ class GroupsActivity : AppCompatActivity() {
             name = groupName,
             createdBy = currentUser.uid,
             members = listOf(currentUser.uid),
-            createdAt = timestamp // Save creation time
+            createdAt = timestamp
         )
 
         newGroupRef.set(newGroup)

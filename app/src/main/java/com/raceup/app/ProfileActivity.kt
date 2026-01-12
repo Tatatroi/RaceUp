@@ -40,14 +40,11 @@ class ProfileActivity : AppCompatActivity() {
 
         val btnEditProfile = findViewById<Button>(R.id.btnEditProfile)
 
-        // 1. Click Image to Change it
         findViewById<androidx.cardview.widget.CardView>(R.id.cardProfileImage).setOnClickListener {
             pickImageFromGallery()
         }
 
-        // 2. Click Edit Button (Edit Name/Birthdate)
         btnEditProfile.setOnClickListener {
-            // You can implement a dialog here to edit text fields
             Toast.makeText(this, "Edit Name feature coming soon!", Toast.LENGTH_SHORT).show()
         }
 
@@ -86,32 +83,69 @@ class ProfileActivity : AppCompatActivity() {
             }
     }
 
+//    private fun loadRunHistory() {
+//        if (currentUser == null) return
+//
+//        db.collection("users").document(currentUser.uid).collection("runs")
+//            .get()
+//            .addOnSuccessListener { documents ->
+//                val runList = ArrayList<RunHistoryItemProfile>()
+//                for (doc in documents) {
+//                    runList.add(RunHistoryItemProfile(
+//                        id = doc.id,
+//                        name = doc.getString("name") ?: "Unknown Race",
+//                        distance = doc.getString("distance") ?: "0 km",
+//                        date = doc.getString("date") ?: ""
+//                    ))
+//                }
+//
+//                // Set Adapter
+//                recyclerHistory.adapter = ProfileRacesAdapter(runList) { selectedRun ->
+//                    // ON CLICK: Open Race Details
+//                    // Assuming you have a RaceDetailsActivity or want to show a Dialog
+//                    showRunDetailsDialog(selectedRun)
+//                }
+//            }
+//    }
+
     private fun loadRunHistory() {
         if (currentUser == null) return
 
         db.collection("users").document(currentUser.uid).collection("runs")
             .get()
             .addOnSuccessListener { documents ->
-                val runList = ArrayList<RunHistoryItem>()
+                val runList = ArrayList<RunHistoryItemProfile>()
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
                 for (doc in documents) {
-                    runList.add(RunHistoryItem(
+                    val raceName = doc.getString("raceName") ?: "Unknown Race"
+
+                    val meters = doc.getDouble("distanceMeters") ?: 0.0
+                    val distStr = String.format(Locale.US, "%.2f km", meters / 1000.0)
+
+                    var dateStr = ""
+                    val timestamp = doc.getTimestamp("date")
+                    if (timestamp != null) {
+                        dateStr = sdf.format(timestamp.toDate())
+                    }
+
+                    runList.add(RunHistoryItemProfile(
                         id = doc.id,
-                        name = doc.getString("name") ?: "Unknown Race",
-                        distance = doc.getString("distance") ?: "0 km",
-                        date = doc.getString("date") ?: ""
+                        name = raceName,
+                        distance = distStr,
+                        date = dateStr
                     ))
                 }
 
-                // Set Adapter
                 recyclerHistory.adapter = ProfileRacesAdapter(runList) { selectedRun ->
-                    // ON CLICK: Open Race Details
-                    // Assuming you have a RaceDetailsActivity or want to show a Dialog
                     showRunDetailsDialog(selectedRun)
                 }
             }
+            .addOnFailureListener {
+                it.printStackTrace()
+            }
     }
 
-    // Helper to calculate age from DD/MM/YYYY
     private fun calculateAge(dateStr: String): String {
         if (dateStr.isEmpty()) return "--"
         return try {
@@ -131,7 +165,6 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    // --- IMAGE PICKER LOGIC ---
     private val PICK_IMAGE_CODE = 1001
 
     private fun pickImageFromGallery() {
@@ -145,10 +178,7 @@ class ProfileActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_CODE && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
-                // 1. Permission to read this URI in the future
                 contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                // 2. Save the URI string to Firestore
                 if (currentUser != null) {
                     db.collection("users").document(currentUser.uid)
                         .update("localImagePath", uri.toString())
@@ -160,8 +190,7 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    // Simple Dialog to show details when a race is clicked
-    private fun showRunDetailsDialog(run: RunHistoryItem) {
+    private fun showRunDetailsDialog(run: RunHistoryItemProfile) {
         AlertDialog.Builder(this)
             .setTitle(run.name)
             .setMessage("Date: ${run.date}\nDistance: ${run.distance}")

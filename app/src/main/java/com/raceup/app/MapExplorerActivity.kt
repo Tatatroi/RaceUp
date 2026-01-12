@@ -26,7 +26,6 @@ class MapExplorerActivity : AppCompatActivity(), OnMapReadyCallback {
     private val db = FirebaseFirestore.getInstance()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    // Permission Launcher
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -40,7 +39,6 @@ class MapExplorerActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_explorer)
 
-        // Initialize Location Services
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
@@ -52,11 +50,7 @@ class MapExplorerActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        // 1. Load the races (Red Pins)
         loadRacesOnMap()
-
-        // 2. Check Permission & Zoom to User (Blue Dot)
         checkLocationPermission()
     }
 
@@ -73,14 +67,11 @@ class MapExplorerActivity : AppCompatActivity(), OnMapReadyCallback {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) return
 
-        // Turn on the Blue Dot
         mMap.isMyLocationEnabled = true
-
-        // Get last known location and zoom there
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 val userLatLng = LatLng(location.latitude, location.longitude)
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 10f)) // Zoom level 10 is good for "City/Region" view
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 10f))
             }
         }
     }

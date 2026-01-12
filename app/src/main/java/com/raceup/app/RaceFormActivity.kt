@@ -21,27 +21,20 @@ import java.util.Calendar
 
 class RaceFormActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    // UI Elements
     private lateinit var raceNameEditText: EditText
     private lateinit var websiteEditText: EditText
     private lateinit var raceDateButton: Button
     private lateinit var submitButton: Button
-
-    // Checkboxes
     private lateinit var cb5k: CheckBox
     private lateinit var cb10k: CheckBox
     private lateinit var cbHalf: CheckBox
     private lateinit var cbFull: CheckBox
     private lateinit var customDistanceEditText: EditText
-
     private var selectedDate: String? = null
-
-    // Map & Location Variables
     private lateinit var mMap: GoogleMap
     private var selectedLocation: LatLng? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    // 1. Permission Launcher: Handles the user's response to "Allow Location?"
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -66,10 +59,8 @@ class RaceFormActivity : AppCompatActivity(), OnMapReadyCallback {
         cbFull = findViewById(R.id.cbFull)
         customDistanceEditText = findViewById(R.id.customDistanceEditText)
 
-        // 2. Initialize Location Client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Fix ScrollView issue
         val scrollView = findViewById<ScrollView>(R.id.scrollView)
         val mapContainer = findViewById<FrameLayout>(R.id.mapContainer)
         mapContainer.setOnTouchListener { _, event ->
@@ -82,12 +73,10 @@ class RaceFormActivity : AppCompatActivity(), OnMapReadyCallback {
             false
         }
 
-        // Initialize Map
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        // Date Picker Logic
         raceDateButton.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
@@ -112,41 +101,30 @@ class RaceFormActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // 3. Click Listener: Add the pin ONLY when user clicks
         mMap.setOnMapClickListener { latLng ->
-            mMap.clear() // Clear previous pins
+            mMap.clear()
             mMap.addMarker(MarkerOptions().position(latLng).title("Race Start"))
-            selectedLocation = latLng // Save this for the database
+            selectedLocation = latLng
         }
-
-        // 4. Check Permissions & Enable Location
         checkLocationPermission()
     }
 
     private fun checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
-            // Permission already granted -> Turn it on
             enableUserLocation()
         } else {
-            // Ask for permission
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
     private fun enableUserLocation() {
-        // Double check permission before calling API (required by Android)
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) return
-
-        // A. Show the Blue Dot
         mMap.isMyLocationEnabled = true
-
-        // B. Get Last Known Location and Zoom there
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 val userLatLng = LatLng(location.latitude, location.longitude)
-                // Move camera WITHOUT adding a marker
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15f))
             }
         }
@@ -171,7 +149,6 @@ class RaceFormActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        // 5. Validation: Ensure user tapped the map
         if (selectedLocation == null) {
             Toast.makeText(this, "Please tap the map to mark the exact start location", Toast.LENGTH_SHORT).show()
             return

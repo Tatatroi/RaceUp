@@ -5,9 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.raceup.app.R // Ensure correct R import
 
-data class RunHistoryItem(
+data class RunHistoryItemProfile(
     val id: String,
     val name: String,
     val distance: String,
@@ -15,8 +14,8 @@ data class RunHistoryItem(
 )
 
 class ProfileRacesAdapter(
-    private val runs: List<RunHistoryItem>,
-    private val onRunClicked: (RunHistoryItem) -> Unit
+    private val runs: List<RunHistoryItemProfile>,
+    private val onRunClicked: (RunHistoryItemProfile) -> Unit
 ) : RecyclerView.Adapter<ProfileRacesAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

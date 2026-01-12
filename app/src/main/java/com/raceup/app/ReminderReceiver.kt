@@ -19,8 +19,6 @@ class ReminderReceiver : BroadcastReceiver() {
         val message = intent.getStringExtra("message") ?: "Upcoming Race!"
         val raceId = intent.getStringExtra("raceId") ?: ""
 
-        // 1. Create the Notification Channel (Required for Android 8+)
-        // IMPORTANCE_DEFAULT means it makes a sound but doesn't pop over everything intrusively
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "race_reminders"
             val channelName = "Race Reminders"
@@ -30,7 +28,6 @@ class ReminderReceiver : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // 2. Define what happens when you tap the notification
         val tapIntent = Intent(context, RaceDetailsActivity::class.java).apply {
             putExtra("raceId", raceId)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -42,16 +39,14 @@ class ReminderReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // 3. Build the actual Notification
         val builder = NotificationCompat.Builder(context, "race_reminders")
-            .setSmallIcon(R.drawable.ic_calendar_today_24) // Ensure this icon exists
+            .setSmallIcon(R.drawable.ic_calendar_today_24)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
-            .setAutoCancel(true) // Removes notification when tapped
+            .setAutoCancel(true)
 
-        // 4. Show it (Check permission first)
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
             == PackageManager.PERMISSION_GRANTED) {
             NotificationManagerCompat.from(context).notify(System.currentTimeMillis().toInt(), builder.build())

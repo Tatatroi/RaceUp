@@ -16,7 +16,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
     private lateinit var registerRedirect: TextView
-    private lateinit var guestButton: TextView // New Guest Button
+    private lateinit var guestButton: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +27,6 @@ class LoginActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.loginButton)
         registerRedirect = findViewById(R.id.registerRedirect)
 
-        // Make sure to add this ID to your XML (code below)
-        // If you haven't added it yet, comment this line out to avoid a crash
         guestButton = findViewById(R.id.guestButton)
 
         loginButton.setOnClickListener {
@@ -42,11 +40,7 @@ class LoginActivity : AppCompatActivity() {
 
             FirebaseAuthManager().loginUser(email, password) { success, errorMessage ->
                 if (success) {
-                    // OLD: Toast.makeText(this, "Welcome, $email", Toast.LENGTH_SHORT).show()
-
-                    // NEW: Just show the email
                     Toast.makeText(this, email, Toast.LENGTH_SHORT).show()
-
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 } else {
@@ -59,7 +53,6 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-        // Logic for "Continue as Guest"
         guestButton.setOnClickListener {
             goToMainActivity()
         }
@@ -67,7 +60,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        // AUTO-REDIRECT: Check if user is already signed in
         if (FirebaseAuth.getInstance().currentUser != null) {
             goToMainActivity()
         }
@@ -75,7 +67,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun goToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
-        // clear wrapper tasks so user can't "back" into login
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

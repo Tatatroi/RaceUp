@@ -1,8 +1,6 @@
 package com.raceup.app
 
-import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +21,6 @@ import java.util.Locale
 import com.google.firebase.Timestamp
 import java.util.Date
 
-// Updated Data Class with ID
 data class MemberStats(val userId: String, val name: String, val totalDistance: Double, val totalRuns: Int)
 
 class GroupDetailsActivity : AppCompatActivity() {
@@ -53,7 +50,6 @@ class GroupDetailsActivity : AppCompatActivity() {
             showAddMemberDialog()
         }
 
-        // Handle Leave/Delete Button
         btnExitGroup.setOnClickListener {
             if (currentUser?.uid == groupCreatorId) {
                 confirmDeleteGroup()
@@ -81,13 +77,11 @@ class GroupDetailsActivity : AppCompatActivity() {
                     groupCreationTimestamp = document.getLong("createdAt") ?: 0L
                     groupCreatorId = document.getString("createdBy") ?: ""
 
-                    // UPDATE UI: Am I the Admin?
                     updateAdminUI()
 
                     val members = document.get("members") as? List<String> ?: emptyList()
                     calculateLeaderboard(members)
                 } else {
-                    // Group was deleted while I was looking at it
                     Toast.makeText(this, "Group no longer exists", Toast.LENGTH_SHORT).show()
                     finish()
                 }
@@ -104,7 +98,6 @@ class GroupDetailsActivity : AppCompatActivity() {
         }
     }
 
-    // --- BUTTON ACTIONS ---
 
     private fun confirmDeleteGroup() {
         AlertDialog.Builder(this)
@@ -157,7 +150,6 @@ class GroupDetailsActivity : AppCompatActivity() {
             .show()
     }
 
-    // --- LEADERBOARD LOGIC ---
 
     private fun calculateLeaderboard(memberIds: List<String>) {
         if (memberIds.isEmpty()) return
@@ -208,17 +200,14 @@ class GroupDetailsActivity : AppCompatActivity() {
                                 }
 
                                 if (isDateValid && runTimeInMillis >= groupMidnightTime) {
-                                    val distString = run.getString("distance") ?: "0"
-                                    val cleanDistString = distString.split(",")[0]
-                                    val distValue = cleanDistString.replace("km", "").replace(",", ".").trim().toDoubleOrNull() ?: 0.0
-
-                                    totalDist += distValue
+                                    val meters = run.getDouble("distanceMeters") ?: 0.0
+                                    val km = meters / 1000.0
+                                    totalDist += km
                                     validRunCount++
                                 }
                             } catch (e: Exception) { e.printStackTrace() }
                         }
 
-                        // PASS userId to the data object
                         statsList.add(MemberStats(userId, fullName, totalDist, validRunCount))
                         processedCount++
 
@@ -238,13 +227,10 @@ class GroupDetailsActivity : AppCompatActivity() {
     private fun showLeaderboard(list: ArrayList<MemberStats>) {
         list.sortByDescending { it.totalDistance }
 
-        // We pass a function here that runs when you LONG PRESS a user
         recyclerLeaderboard.adapter = LeaderboardAdapter(list) { selectedMember ->
 
-            // 1. Check if I am the Creator
             if (currentUser?.uid == groupCreatorId) {
 
-                // 2. Check if the person I clicked is NOT me (Can't kick myself)
                 if (selectedMember.userId != currentUser.uid) {
                     confirmKickMember(selectedMember.userId, selectedMember.name)
                 } else {
@@ -254,7 +240,7 @@ class GroupDetailsActivity : AppCompatActivity() {
         }
     }
 
-    // ... (Keep showAddMemberDialog and addMemberByEmail exactly as they were) ...
+
     private fun showAddMemberDialog() {
         val input = EditText(this)
         input.hint = "Enter friend's email"
@@ -289,7 +275,6 @@ class GroupDetailsActivity : AppCompatActivity() {
             }
     }
 
-    // Updated Adapter to accept a "Long Click" function
     class LeaderboardAdapter(
         private val stats: List<MemberStats>,
         private val onMemberLongClick: (MemberStats) -> Unit // <--- NEW PARAMETER
@@ -315,11 +300,9 @@ class GroupDetailsActivity : AppCompatActivity() {
             holder.stats.text = "Runs: ${item.totalRuns}"
             holder.total.text = String.format("%.1f km", item.totalDistance)
 
-            // --- THE LOGIC FOR KICKING ---
-            // When you hold down on a name...
             holder.itemView.setOnLongClickListener {
-                onMemberLongClick(item) // Trigger the popup
-                true // "True" means we consumed the click
+                onMemberLongClick(item)
+                true
             }
         }
 

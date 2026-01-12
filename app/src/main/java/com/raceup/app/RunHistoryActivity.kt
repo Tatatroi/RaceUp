@@ -23,7 +23,7 @@ class RunHistoryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_run_history) // We will create this XML next
+        setContentView(R.layout.activity_run_history)
 
         recyclerView = findViewById(R.id.recyclerViewHistory)
         progressBar = findViewById(R.id.progressBar)
@@ -40,7 +40,7 @@ class RunHistoryActivity : AppCompatActivity() {
         if (uid == null) return
 
         db.collection("users").document(uid).collection("runs")
-            .orderBy("date", Query.Direction.DESCENDING) // Show newest first
+            .orderBy("date", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documents ->
                 if (documents.isEmpty) {

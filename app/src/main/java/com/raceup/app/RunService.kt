@@ -20,8 +20,6 @@ class RunService : Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private var lastLocation: Location? = null
-
-    // Timer & Stats
     private var secondsElapsed = 0L
     private var totalDistanceMeters = 0.0
     private val handler = Handler(Looper.getMainLooper())
@@ -39,7 +37,6 @@ class RunService : Service() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         createNotificationChannel()
 
-        // FIX FOR ANDROID 14: Must specify the service type if you declared it in Manifest
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(1, buildNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
         } else {
@@ -61,8 +58,6 @@ class RunService : Service() {
                         totalDistanceMeters += lastLocation!!.distanceTo(location)
                     }
                     lastLocation = location
-
-                    // Optional: Broadcast immediately on location change for smoother distance
                     broadcastUpdate()
                 }
             }
@@ -77,9 +72,6 @@ class RunService : Service() {
         } catch (e: SecurityException) {
             Log.e("RunService", "Location Permission missing: ${e.message}")
         }
-
-        // FIX: Start timer OUTSIDE the try block so it runs even if GPS is slow to start
-        // (But usually, you want to ensure permissions are granted before starting service)
         handler.post(timerRunnable)
     }
 
@@ -87,7 +79,6 @@ class RunService : Service() {
         val intent = Intent("RACE_UPDATE")
         intent.putExtra("SECONDS", secondsElapsed)
         intent.putExtra("DISTANCE", totalDistanceMeters)
-        // Required for newer Android versions to ensure specific package receives it
         intent.setPackage(packageName)
         sendBroadcast(intent)
     }
@@ -108,7 +99,7 @@ class RunService : Service() {
             .setContentTitle("RaceUp is tracking your run")
             .setContentText("Keep going!")
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-            .setOngoing(true) // Prevents user from swiping it away accidentally
+            .setOngoing(true)
             .build()
     }
 

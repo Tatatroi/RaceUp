@@ -28,16 +28,13 @@ class RunTrackerActivity : AppCompatActivity() {
     private lateinit var tvPace: TextView
     private lateinit var btnAction: Button
 
-    // Data
     private var raceId: String? = null
     private var currentSeconds = 0L
     private var currentDistanceMeters = 0.0
     private var raceName: String = "Unknown Race"
 
-    // State Flag
     private var isRunStarted = false
 
-    // Broadcast Receiver to get data from background Service
     private val runUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent != null) {
@@ -69,16 +66,12 @@ class RunTrackerActivity : AppCompatActivity() {
         tvDistance = findViewById(R.id.tvDistance)
         tvPace = findViewById(R.id.tvPace)
 
-        // Make sure to match the ID in your XML (I changed it to btnAction)
         btnAction = findViewById(R.id.btnAction)
 
-        // 1. CLICK LISTENER - Handles both Start and Stop
         btnAction.setOnClickListener {
             if (!isRunStarted) {
-                // User wants to START
                 checkPermissionsAndStart()
             } else {
-                // User wants to FINISH
                 stopRunAndSave()
             }
         }
@@ -90,7 +83,6 @@ class RunTrackerActivity : AppCompatActivity() {
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-        // Android 13+ needs Notification permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissions.add(Manifest.permission.POST_NOTIFICATIONS)
         }
@@ -102,7 +94,6 @@ class RunTrackerActivity : AppCompatActivity() {
         if (missingPermissions.isNotEmpty()) {
             ActivityCompat.requestPermissions(this, missingPermissions.toTypedArray(), 100)
         } else {
-            // Permissions exist -> Start immediately
             startService()
         }
     }
@@ -116,7 +107,6 @@ class RunTrackerActivity : AppCompatActivity() {
             registerReceiver(runUpdateReceiver, filter, RECEIVER_NOT_EXPORTED)
         }
 
-        // 2. Start Service
         val intent = Intent(this, RunService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent)
@@ -124,7 +114,6 @@ class RunTrackerActivity : AppCompatActivity() {
             startService(intent)
         }
 
-        // 3. Update UI to "Running Mode"
         isRunStarted = true
         btnAction.text = "FINISH RACE"
         btnAction.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#D32F2F")) // Red
@@ -151,14 +140,12 @@ class RunTrackerActivity : AppCompatActivity() {
     }
 
     private fun stopRunAndSave() {
-        // 1. Stop the Service
         val intent = Intent(this, RunService::class.java)
         stopService(intent)
 
         try {
             unregisterReceiver(runUpdateReceiver)
         } catch (e: Exception) {
-            // Ignore
         }
 
         btnAction.isEnabled = false
@@ -190,16 +177,13 @@ class RunTrackerActivity : AppCompatActivity() {
                 finish()
             }
             .addOnFailureListener { e ->
-                // THIS IS THE IMPORTANT CHANGE: Show the actual error message
                 Toast.makeText(this, "Save Failed: ${e.message}", Toast.LENGTH_LONG).show()
 
-                // Re-enable button so you can try again if it was just a network blip
                 btnAction.isEnabled = true
                 btnAction.text = "RETRY SAVE"
             }
     }
 
-    // Handle Permission Result
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100) {
@@ -213,8 +197,6 @@ class RunTrackerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // If the user closes the app without finishing, we stop the service to avoid battery drain
-        // (Or you can keep it running if you want background tracking to persist after close)
         if(isRunStarted) {
             val intent = Intent(this, RunService::class.java)
             stopService(intent)
